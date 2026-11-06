@@ -7,6 +7,7 @@
 #include <QFileInfo>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QSettings>
 #include <QStandardPaths>
 
 namespace {
@@ -40,6 +41,18 @@ Backend::Backend(const QString &currentDirectory, QObject *parent)
     if (!mode.isEmpty() && paletteModes().contains(mode))
         m_paletteMode = mode;
     refreshTheme();
+
+    const auto colors = readColors();
+    m_customColors = {
+        colors.value("background", "#1a1b26"),
+        colors.value("lighter_background", "#24283b"),
+        colors.value("accent", "#7aa2f7"),
+        colors.value("bright_cyan", "#0db9d7"),
+    };
+    const QStringList saved = QSettings().value("customColors").toStringList();
+    if (saved.size() == 4) {
+        m_customColors = saved;
+    }
 }
 
 Backend::~Backend() {
@@ -58,7 +71,7 @@ QStringList Backend::styles() const {
 }
 
 QStringList Backend::paletteModes() const {
-    return {"theme", "cool", "warm", "mono", "surprise"};
+    return {"theme", "cool", "warm", "mono", "custom", "surprise"};
 }
 
 QStringList Backend::sizes() const {
@@ -252,6 +265,20 @@ void Backend::generationFinished(int exitCode, QProcess::ExitStatus status) {
                            : tr("Generation failed: %1").arg(message));
 }
 
+void Backend::setCustomColor(int index, const QString &color) {
+    if (index < 0 || index >= 4)
+        return;
+    const QColor chosen(color);
+    if (!chosen.isValid())
+        return;
+    if (m_customColors.size() != 4)
+        m_customColors = {"#13141c", "#24283b", "#7aa2f7", "#0db9d7"};
+    m_customColors[index] = chosen.name();
+    QSettings().setValue("customColors", m_customColors);
+    emit customColorsChanged();
+    emit paletteChanged();
+}
+
 void Backend::apply(const QString &path) {
     if (path.isEmpty() || !QFileInfo::exists(path)) {
         fail(tr("That wallpaper is gone; generate again."));
@@ -335,6 +362,21 @@ void Backend::saveSet() {
 QStringList Backend::batchPalettes() const {
     if (m_paletteMode == "surprise")
         return {};
+
+    if (m_paletteMode == "custom") {
+        const QString dark = m_customColors.value(0, "#13141c");
+        const QString light = m_customColors.value(1, "#24283b");
+        const QString accentA = m_customColors.value(2, "#7aa2f7");
+        const QString accentB = m_customColors.value(3, "#0db9d7");
+        const QString mid = mixedColor(dark, light, 0.5);
+        const int count = qMax(1, m_count);
+        QStringList palettes;
+        for (int i = 0; i < count; ++i) {
+            const double t = count == 1 ? 0.0 : double(i) / double(count - 1);
+            palettes << QStringList{dark, mid, light, mixedColor(accentA, accentB, t)}.join(',');
+        }
+        return palettes;
+    }
 
     const auto colors = readColors();
     const auto get = [&colors](const char *key, const QString &fallback) {

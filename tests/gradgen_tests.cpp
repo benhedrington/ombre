@@ -117,6 +117,16 @@ private slots:
         QCOMPARE(backend.paletteColors().last(), QString("#b2b20c"));
     }
 
+    void environmentChoosesThePaletteMode()
+    {
+        qputenv("GRADGEN_PALETTE_MODE", "custom");
+        QTemporaryDir dir;
+        Backend backend(dir.path());
+        QVERIFY(backend.paletteModes().contains("custom"));
+        QCOMPARE(backend.paletteMode(), QString("custom"));
+        qunsetenv("GRADGEN_PALETTE_MODE");
+    }
+
     void grainIsClamped()
     {
         QTemporaryDir dir;

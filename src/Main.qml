@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls.Material
 import QtQuick.Layouts
+import QtQuick.Dialogs
 
 ApplicationWindow {
     id: win
@@ -18,6 +19,7 @@ ApplicationWindow {
     Material.roundedScale: theme.radius
 
     property bool helpVisible: false
+    property int pickerIndex: 0
 
     function applyCurrent() {
         if (backend.busy || backend.previews.length === 0)
@@ -29,6 +31,12 @@ ApplicationWindow {
     Shortcut { sequence: "Q"; context: Qt.ApplicationShortcut; onActivated: Qt.quit() }
     Shortcut { sequence: "Space"; context: Qt.ApplicationShortcut; onActivated: backend.generateNew() }
     Shortcut { sequence: "S"; context: Qt.ApplicationShortcut; onActivated: backend.saveSet() }
+
+    ColorDialog {
+        id: colorPicker
+        title: qsTr("Palette colour")
+        onAccepted: backend.setCustomColor(win.pickerIndex, selectedColor.toString())
+    }
 
     // Right-to-left languages mirror the window; the Translator sets the
     // application's layout direction.
@@ -110,9 +118,9 @@ ApplicationWindow {
                             focusPolicy: Qt.NoFocus
                             font.pixelSize: 12
                             Layout.preferredWidth: 105
-                            model: [qsTr("Theme"), qsTr("Cool"), qsTr("Warm"), qsTr("Mono"), qsTr("Surprise")]
+                            model: [qsTr("Theme"), qsTr("Cool"), qsTr("Warm"), qsTr("Mono"), qsTr("Custom"), qsTr("Surprise")]
                             currentIndex: backend.paletteModes.indexOf(backend.paletteMode)
-                            onActivated: backend.paletteMode = backend.paletteModes[index]
+                            onActivated: function(index) { backend.paletteMode = backend.paletteModes[index] }
                         }
 
                         Label { text: qsTr("Style"); color: "#8b8ba3"; font.pixelSize: 12 }
@@ -123,7 +131,7 @@ ApplicationWindow {
                             Layout.preferredWidth: 105
                             model: [qsTr("Any"), qsTr("Linear"), qsTr("Glow"), qsTr("Aurora"), qsTr("Mesh"), qsTr("Beam"), qsTr("Orb"), qsTr("Horizon"), qsTr("Split")]
                             currentIndex: backend.styles.indexOf(backend.style)
-                            onActivated: backend.style = backend.styles[index]
+                            onActivated: function(index) { backend.style = backend.styles[index] }
                         }
 
                         Label { text: qsTr("Size"); color: "#8b8ba3"; font.pixelSize: 12 }
@@ -134,7 +142,7 @@ ApplicationWindow {
                             Layout.preferredWidth: 125
                             model: ["1920×1200", "1920×1080", "3840×2400", "3840×2160"]
                             currentIndex: backend.sizes.indexOf(backend.size)
-                            onActivated: backend.size = backend.sizes[index]
+                            onActivated: function(index) { backend.size = backend.sizes[index] }
                         }
 
                         Item { Layout.fillWidth: true }
@@ -146,6 +154,43 @@ ApplicationWindow {
                             enabled: !backend.busy
                             onClicked: backend.generateNew()
                         }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 10
+                        visible: backend.paletteMode === "custom"
+
+                        Label { text: qsTr("Custom"); color: "#8b8ba3"; font.pixelSize: 12 }
+                        Row {
+                            spacing: 6
+                            Repeater {
+                                model: backend.customColors
+                                Rectangle {
+                                    width: 26
+                                    height: 26
+                                    radius: 5
+                                    color: modelData
+                                    border.color: "#44ffffff"
+                                    border.width: 1
+                                    MouseArea {
+                                        anchors.fill: parent
+                                        cursorShape: Qt.PointingHandCursor
+                                        onClicked: {
+                                            win.pickerIndex = index
+                                            colorPicker.selectedColor = modelData
+                                            colorPicker.open()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        Label {
+                            text: qsTr("Click a swatch to change it")
+                            color: "#565f89"
+                            font.pixelSize: 11
+                        }
+                        Item { Layout.fillWidth: true }
                     }
 
                     RowLayout {
@@ -248,7 +293,7 @@ ApplicationWindow {
                             anchors.margins: 4
                             radius: Math.min(6, theme.radius)
                             color: "#181820"
-                            border.width: grid.currentIndex === index ? 2 : 1
+                            border.width: grid.currentIndex === index ? 3 : 1
                             border.color: grid.currentIndex === index ? theme.accent : "#262633"
                             clip: true
 
@@ -258,12 +303,28 @@ ApplicationWindow {
                                 fillMode: Image.PreserveAspectCrop
                                 asynchronous: true
                                 cache: false
+                                opacity: grid.currentIndex === index ? 1.0 : 0.78
                             }
 
                             Rectangle {
-                                anchors.fill: parent
-                                color: "#00000000"
-                                border.width: 0
+                                visible: grid.currentIndex === index
+                                width: 24
+                                height: 24
+                                radius: 12
+                                anchors.top: parent.top
+                                anchors.right: parent.right
+                                anchors.margins: 9
+                                color: theme.accent
+                                border.color: "#cc000000"
+                                border.width: 1
+
+                                Label {
+                                    anchors.centerIn: parent
+                                    text: "✓"
+                                    color: theme.accentForeground
+                                    font.pixelSize: 14
+                                    font.bold: true
+                                }
                             }
 
                             MouseArea {
@@ -333,6 +394,13 @@ ApplicationWindow {
                     text: backend.status
                     color: "#8b8ba3"
                     elide: Text.ElideRight
+                }
+
+                Label {
+                    visible: backend.previews.length > 0 && !backend.busy
+                    text: qsTr("Selected %1 / %2").arg(grid.currentIndex + 1).arg(backend.previews.length)
+                    color: "#c8c8d8"
+                    font.pixelSize: 12
                 }
 
                 Button {

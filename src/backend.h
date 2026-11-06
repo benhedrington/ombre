@@ -15,6 +15,7 @@ class Backend : public QObject {
     Q_PROPERTY(bool busy READ busy NOTIFY busyChanged)
     Q_PROPERTY(QStringList previews READ previews NOTIFY previewsChanged)
     Q_PROPERTY(QStringList paletteColors READ paletteColors NOTIFY paletteChanged)
+    Q_PROPERTY(QStringList customColors READ customColors NOTIFY customColorsChanged)
     Q_PROPERTY(QString themeName READ themeName NOTIFY themeNameChanged)
     Q_PROPERTY(int lastSeed READ lastSeed NOTIFY lastSeedChanged)
 
@@ -37,6 +38,7 @@ public:
     bool busy() const { return m_busy; }
     QStringList previews() const { return m_previews; }
     QStringList paletteColors() const;
+    QStringList customColors() const { return m_customColors; }
     QString themeName() const { return m_themeName; }
     int lastSeed() const { return m_lastSeed; }
 
@@ -66,6 +68,7 @@ public:
     Q_INVOKABLE void generateNew();
     Q_INVOKABLE void reroll();
     Q_INVOKABLE void cancel();
+    Q_INVOKABLE void setCustomColor(int index, const QString &color);
     Q_INVOKABLE void apply(const QString &path);
     Q_INVOKABLE void saveSet();
 
@@ -74,6 +77,7 @@ signals:
     void busyChanged();
     void previewsChanged();
     void paletteChanged();
+    void customColorsChanged();
     void themeNameChanged();
     void lastSeedChanged();
     void styleChanged();
@@ -106,6 +110,7 @@ private:
     QString m_size = "wuxga";
     int m_count = 6;
     QString m_paletteMode = "theme";
+    QStringList m_customColors;
     int m_seed = 1;
     int m_lastSeed = 0;
     QString m_themeName = "Omarchy";

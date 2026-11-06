@@ -31,15 +31,19 @@ the package with `makepkg -fsi` so it appears in the app launcher.
 | ? | Show the shortcuts |
 | Q | Quit |
 
-Double-clicking a candidate applies it. The palette swatches in the header are
-the four colours the next set will use.
+The selected candidate has an accent border and a check badge, the rest dim
+slightly, and the footer shows `Selected n / total`. Double-clicking a
+candidate applies it. The palette swatches in the header are the colours the
+next set will use.
 
 ## Controls
 
 - **Palette** — `Theme` keeps the theme's dark background shades but rotates
   through its accent families (blue, purple, cyan, red, yellow, green) on every
-  generation. `Cool`, `Warm` and `Mono` are fixed families. `Surprise` hands the
-  palette to the renderer, so it can land outside the theme.
+  generation. `Cool`, `Warm` and `Mono` are fixed families. `Custom` gives you
+  four swatches — background, surface, accent A, accent B — and the set sweeps
+  from A to B. Click a swatch to open the colour picker; the choice is saved.
+  `Surprise` hands the palette to the renderer, so it can land outside the theme.
 - The set sweeps from the first accent to the second, so the images vary within
   a family instead of being six copies. The header swatches show both ends.
 - Accents are pulled toward the theme's lighter background on purpose. A

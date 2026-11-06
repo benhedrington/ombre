@@ -95,6 +95,15 @@ void Backend::setSoft(bool soft) {
         return;
     m_soft = soft;
     emit softChanged();
+    emit paletteChanged();
+}
+
+void Backend::setGrain(double grain) {
+    grain = qBound(0.0, grain, 0.1);
+    if (qFuzzyCompare(grain, m_grain))
+        return;
+    m_grain = grain;
+    emit grainChanged();
 }
 
 void Backend::setSize(const QString &size) {
@@ -177,6 +186,7 @@ void Backend::generate() {
         "-f", "webp",
         "-q", "92",
         "--style", m_style,
+        "--grain", QString::number(m_grain, 'f', 3),
         "--seed", QString::number(m_seed),
         "-o", m_previewDirectory,
     };
@@ -371,6 +381,13 @@ QStringList Backend::batchPalettes() const {
         const int index = m_seed % int(sizeof(families) / sizeof(families[0]));
         first = get(families[index].first, accent);
         last = get(families[index].last, accent);
+    }
+
+    // Soft pulls the accents toward the theme's lighter background, which
+    // lowers contrast and saturation without changing the hue family.
+    if (m_soft) {
+        first = mixedColor(first, lighter, 0.35);
+        last = mixedColor(last, lighter, 0.35);
     }
 
     // The set sweeps from the first accent to the second, so the six images

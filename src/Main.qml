@@ -94,85 +94,127 @@ ApplicationWindow {
                 border.color: "#1f1f2b"
                 border.width: 1
 
-                RowLayout {
+                ColumnLayout {
                     id: controls
                     anchors.fill: parent
                     anchors.margins: 12
-                    spacing: 7
+                    spacing: 8
 
-                    Label { text: qsTr("Palette"); color: "#8b8ba3"; font.pixelSize: 12 }
-                    ComboBox {
-                        id: paletteBox
-                        focusPolicy: Qt.NoFocus
-                        font.pixelSize: 12
-                        Layout.preferredWidth: 105
-                        model: [qsTr("Theme"), qsTr("Cool"), qsTr("Warm"), qsTr("Mono"), qsTr("Surprise")]
-                        currentIndex: backend.paletteModes.indexOf(backend.paletteMode)
-                        onActivated: backend.paletteMode = backend.paletteModes[index]
-                    }
-
-                    Label { text: qsTr("Style"); color: "#8b8ba3"; font.pixelSize: 12 }
-                    ComboBox {
-                        id: styleBox
-                        focusPolicy: Qt.NoFocus
-                        font.pixelSize: 12
-                        Layout.preferredWidth: 105
-                        model: [qsTr("Any"), qsTr("Linear"), qsTr("Glow"), qsTr("Aurora"), qsTr("Mesh")]
-                        currentIndex: backend.styles.indexOf(backend.style)
-                        onActivated: backend.style = backend.styles[index]
-                    }
-
-                    Label { text: qsTr("Size"); color: "#8b8ba3"; font.pixelSize: 12 }
-                    ComboBox {
-                        id: sizeBox
-                        focusPolicy: Qt.NoFocus
-                        font.pixelSize: 12
-                        Layout.preferredWidth: 125
-                        model: ["1920×1200", "1920×1080", "3840×2400", "3840×2160"]
-                        currentIndex: backend.sizes.indexOf(backend.size)
-                        onActivated: backend.size = backend.sizes[index]
-                    }
-
-                    CheckBox {
-                        focusPolicy: Qt.NoFocus
-                        text: qsTr("Soft")
-                        checked: backend.soft
-                        onToggled: backend.soft = checked
-                    }
-
-                    Label { text: qsTr("Count"); color: "#8b8ba3"; font.pixelSize: 12 }
                     RowLayout {
-                        spacing: 2
+                        Layout.fillWidth: true
+                        spacing: 7
 
-                        ToolButton {
+                        Label { text: qsTr("Palette"); color: "#8b8ba3"; font.pixelSize: 12 }
+                        ComboBox {
+                            id: paletteBox
                             focusPolicy: Qt.NoFocus
-                            text: "−"
-                            font.pixelSize: 16
-                            onClicked: backend.count = Math.max(3, backend.count - 1)
+                            font.pixelSize: 12
+                            Layout.preferredWidth: 105
+                            model: [qsTr("Theme"), qsTr("Cool"), qsTr("Warm"), qsTr("Mono"), qsTr("Surprise")]
+                            currentIndex: backend.paletteModes.indexOf(backend.paletteMode)
+                            onActivated: backend.paletteMode = backend.paletteModes[index]
+                        }
+
+                        Label { text: qsTr("Style"); color: "#8b8ba3"; font.pixelSize: 12 }
+                        ComboBox {
+                            id: styleBox
+                            focusPolicy: Qt.NoFocus
+                            font.pixelSize: 12
+                            Layout.preferredWidth: 105
+                            model: [qsTr("Any"), qsTr("Linear"), qsTr("Glow"), qsTr("Aurora"), qsTr("Mesh")]
+                            currentIndex: backend.styles.indexOf(backend.style)
+                            onActivated: backend.style = backend.styles[index]
+                        }
+
+                        Label { text: qsTr("Size"); color: "#8b8ba3"; font.pixelSize: 12 }
+                        ComboBox {
+                            id: sizeBox
+                            focusPolicy: Qt.NoFocus
+                            font.pixelSize: 12
+                            Layout.preferredWidth: 125
+                            model: ["1920×1200", "1920×1080", "3840×2400", "3840×2160"]
+                            currentIndex: backend.sizes.indexOf(backend.size)
+                            onActivated: backend.size = backend.sizes[index]
+                        }
+
+                        CheckBox {
+                            focusPolicy: Qt.NoFocus
+                            text: qsTr("Soft")
+                            checked: backend.soft
+                            onToggled: backend.soft = checked
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Calmer accents, pulled toward the background")
+                        }
+
+                        Item { Layout.fillWidth: true }
+
+                        Button {
+                            focusPolicy: Qt.NoFocus
+                            text: qsTr("Generate")
+                            highlighted: true
+                            enabled: !backend.busy
+                            onClicked: backend.generateNew()
+                        }
+                    }
+
+                    RowLayout {
+                        Layout.fillWidth: true
+                        spacing: 7
+
+                        Label { text: qsTr("Count"); color: "#8b8ba3"; font.pixelSize: 12 }
+                        RowLayout {
+                            spacing: 2
+
+                            ToolButton {
+                                focusPolicy: Qt.NoFocus
+                                text: "−"
+                                font.pixelSize: 16
+                                onClicked: backend.count = Math.max(3, backend.count - 1)
+                            }
+                            Label {
+                                text: backend.count
+                                color: "#ececf4"
+                                font.pixelSize: 13
+                                horizontalAlignment: Text.AlignHCenter
+                                Layout.preferredWidth: 24
+                            }
+                            ToolButton {
+                                focusPolicy: Qt.NoFocus
+                                text: "+"
+                                font.pixelSize: 16
+                                onClicked: backend.count = Math.min(12, backend.count + 1)
+                            }
+                        }
+
+                        Item { Layout.preferredWidth: 10 }
+
+                        Label { text: qsTr("Grain"); color: "#8b8ba3"; font.pixelSize: 12 }
+                        Slider {
+                            id: grainSlider
+                            focusPolicy: Qt.NoFocus
+                            Layout.preferredWidth: 150
+                            from: 0
+                            to: 0.06
+                            stepSize: 0.005
+                            value: backend.grain
+                            onMoved: backend.grain = value
+                            ToolTip.visible: hovered
+                            ToolTip.text: qsTr("Film grain; hides colour banding. 0 is smooth.")
                         }
                         Label {
-                            text: backend.count
-                            color: "#ececf4"
-                            font.pixelSize: 13
-                            horizontalAlignment: Text.AlignHCenter
-                            Layout.preferredWidth: 24
+                            text: backend.grain.toFixed(3)
+                            color: "#8b8ba3"
+                            font.pixelSize: 11
+                            Layout.preferredWidth: 34
                         }
-                        ToolButton {
-                            focusPolicy: Qt.NoFocus
-                            text: "+"
-                            font.pixelSize: 16
-                            onClicked: backend.count = Math.min(12, backend.count + 1)
+
+                        Item { Layout.fillWidth: true }
+
+                        Label {
+                            text: qsTr("Space: new set · Enter: apply")
+                            color: "#565f89"
+                            font.pixelSize: 11
                         }
-                    }
-
-                    Item { Layout.fillWidth: true }
-
-                    Button {
-                        focusPolicy: Qt.NoFocus
-                        text: qsTr("Generate")
-                        highlighted: true
-                        enabled: !backend.busy
-                        onClicked: backend.generateNew()
                     }
                 }
             }

@@ -44,8 +44,12 @@ the four colours the next set will use.
   a family instead of being six copies. The header swatches show both ends.
 - **Style** — `Any`, `Linear`, `Glow`, `Aurora`, or `Mesh`.
 - **Size** — 1920×1200 (this panel), 1920×1080, 3840×2400, 3840×2160.
-- **Soft** — calmer hues and contrast. On by default.
+- **Soft** — calmer accents: pulls the highlight toward the theme's lighter
+  background and, in Surprise mode, asks the renderer for closer hues and lower
+  saturation. On by default.
 - **Count** — 3 to 12 candidates per set.
+- **Grain** — film grain (0 to 0.06, default 0.025) that doubles as dither, so
+  the ramps do not band. 0 is perfectly smooth and may show bands.
 
 ## What it writes
 

@@ -22,6 +22,7 @@ private slots:
               "bright_cyan = \"#0db9d7\"\n");
 
         Backend backend(dir.path());
+        backend.setSoft(false);
         backend.setSeed(0);
         const QStringList palettes = backend.paletteString().split(';');
         QCOMPARE(palettes.size(), 6);
@@ -38,6 +39,7 @@ private slots:
     {
         QTemporaryDir dir;
         Backend backend(dir.path());
+        backend.setSoft(false);
         backend.setSeed(0);
         const QStringList palettes = backend.paletteString().split(';');
         QCOMPARE(palettes.size(), backend.count());
@@ -56,6 +58,7 @@ private slots:
               "bright_yellow = \"#ffff00\"\n");
 
         Backend backend(dir.path());
+        backend.setSoft(false);
         backend.setPaletteMode("warm");
         const QStringList palettes = backend.paletteString().split(';');
         QCOMPARE(palettes.first(), QString("#101010,#111111,#222222,#ff0000"));
@@ -100,6 +103,35 @@ private slots:
         const QStringList palettes = backend.paletteString().split(';');
         QCOMPARE(palettes.size(), 6);
         QVERIFY(palettes.first() != palettes.last());
+    }
+
+    void softPullsTheAccentTowardTheBackground()
+    {
+        QTemporaryDir dir;
+        QDir(dir.path()).mkpath("theme");
+        write(dir.path() + "/theme/colors.toml",
+              "background = \"#111111\"\n"
+              "lighter_background = \"#222222\"\n"
+              "red = \"#ff0000\"\n"
+              "bright_yellow = \"#ffff00\"\n");
+
+        Backend backend(dir.path());
+        backend.setPaletteMode("warm");
+        backend.setSoft(false);
+        const QString sharp = backend.paletteColors().last();
+        backend.setSoft(true);
+        const QString calm = backend.paletteColors().last();
+        QVERIFY(sharp != calm);
+    }
+
+    void grainIsClamped()
+    {
+        QTemporaryDir dir;
+        Backend backend(dir.path());
+        backend.setGrain(0.5);
+        QCOMPARE(backend.grain(), 0.1);
+        backend.setGrain(0.04);
+        QCOMPARE(backend.grain(), 0.04);
     }
 
     void surpriseLeavesThePaletteToTheRenderer()

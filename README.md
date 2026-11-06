@@ -49,8 +49,10 @@ the four colours the next set will use.
 
 ## What it writes
 
-- **Apply** runs `omarchy-theme-bg-set`, the same command the Omarchy menu and
-  `omarchy theme bg next` use. It only changes the background symlink.
+- **Apply** keeps a copy of the chosen image in
+  `~/.local/share/gradgen/applied/` (the preview cache is wiped on the next
+  generation) and runs `omarchy-theme-bg-set`, the same command the Omarchy
+  menu and `omarchy theme bg next` use.
 - **Save set** copies the candidates to
   `~/.config/omarchy/backgrounds/<theme-slug>/` and refreshes the background
   switcher thumbnails. Files are named

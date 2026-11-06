@@ -263,6 +263,23 @@ void Backend::apply(const QString &path) {
         return;
     }
 
+    // The preview directory is wiped whenever a new set is generated, so keep
+    // the chosen image somewhere stable before pointing the desktop at it.
+    const QString directory = QDir::homePath() + "/.local/share/gradgen/applied";
+    if (!QDir().mkpath(directory)) {
+        fail(tr("Could not create %1").arg(directory));
+        return;
+    }
+    QString stable = path;
+    if (QFileInfo(path).absolutePath() != directory) {
+        stable = directory + "/" + QFileInfo(path).fileName();
+        QFile::remove(stable);
+        if (!QFile::copy(path, stable)) {
+            fail(tr("Could not keep a copy of %1").arg(QFileInfo(path).fileName()));
+            return;
+        }
+    }
+
     if (!m_action) {
         m_action = new QProcess(this);
         connect(m_action, &QProcess::finished, this, [this](int code, QProcess::ExitStatus status) {
@@ -276,7 +293,7 @@ void Backend::apply(const QString &path) {
     }
     if (m_action->state() != QProcess::NotRunning)
         m_action->kill();
-    m_action->start(command, {path});
+    m_action->start(command, {stable});
 }
 
 void Backend::saveSet() {

@@ -11,7 +11,7 @@ ApplicationWindow {
     minimumWidth: 960
     minimumHeight: 620
     visible: true
-    title: "gradgen"
+    title: "Ombre"
     color: "#0b0b10"
 
     Material.theme: Material.Dark
@@ -56,7 +56,7 @@ ApplicationWindow {
                 spacing: 12
 
                 Label {
-                    text: "gradgen"
+                    text: "Ombre"
                     color: "#ececf4"
                     font.pixelSize: 28
                     font.weight: Font.DemiBold

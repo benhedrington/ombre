@@ -5,7 +5,7 @@
 
 #include "backend.h"
 
-class GradgenTests : public QObject {
+class OmbreTests : public QObject {
     Q_OBJECT
 
 private slots:
@@ -119,12 +119,12 @@ private slots:
 
     void environmentChoosesThePaletteMode()
     {
-        qputenv("GRADGEN_PALETTE_MODE", "custom");
+        qputenv("OMBRE_PALETTE_MODE", "custom");
         QTemporaryDir dir;
         Backend backend(dir.path());
         QVERIFY(backend.paletteModes().contains("custom"));
         QCOMPARE(backend.paletteMode(), QString("custom"));
-        qunsetenv("GRADGEN_PALETTE_MODE");
+        qunsetenv("OMBRE_PALETTE_MODE");
     }
 
     void sizesCoverTheCommonDeskAspectRatios()
@@ -181,5 +181,5 @@ private:
     }
 };
 
-QTEST_MAIN(GradgenTests)
-#include "gradgen_tests.moc"
+QTEST_MAIN(OmbreTests)
+#include "ombre_tests.moc"

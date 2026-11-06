@@ -1,6 +1,6 @@
-# gradgen
+# Ombre
 
-![gradgen](docs/screenshot.png)
+![Ombre](docs/screenshot.png)
 
 Gradient wallpapers from your desktop's own colours. Press Space for a fresh
 set, arrow through the candidates, Enter to apply one.
@@ -14,7 +14,7 @@ flow warp, vignette, and grain to stop banding.
 
 ```sh
 bin/build
-build/gradgen
+build/ombre
 ```
 
 `bin/test` builds and runs the backend tests offscreen. `bin/install` builds
@@ -62,16 +62,16 @@ next set will use.
 ## What it writes
 
 - **Apply** keeps a copy of the chosen image in
-  `~/.local/share/gradgen/applied/` (the preview cache is wiped on the next
+  `~/.local/share/ombre/applied/` (the preview cache is wiped on the next
   generation) and runs `omarchy-theme-bg-set`, the same command the Omarchy
   menu and `omarchy theme bg next` use.
 - **Save set** copies the candidates to
   `~/.config/omarchy/backgrounds/<theme-slug>/` and refreshes the background
   switcher thumbnails. Files are named
-  `gradgen-<palette>-<style>-<seed>-<n>.webp`; the seed is what makes a set
+  `ombre-<palette>-<style>-<seed>-<n>.webp`; the seed is what makes a set
   reproducible.
 - Candidate images live in the cache
-  (`~/.cache/gradgen/preview/`) and are replaced on every generation.
+  (`~/.cache/Omarchy/ombre/preview/`) and are replaced on every generation.
 
 Nothing else on disk is touched, and the app never edits Omarchy's packaged
 files.
@@ -79,7 +79,7 @@ files.
 ## Renderer
 
 `backend/gradgen.py` is the standalone generator, installed to
-`/usr/share/gradgen/gradgen.py`. The app finds it there, or next to the build,
+`/usr/share/ombre/gradgen.py`. The app finds it there, or next to the build,
 or through `GRADGEN_SCRIPT`. It needs Python 3 with `numpy` and `Pillow`; if the
 system Python lacks them, the app retries through `uv run --with numpy --with
 pillow` so a dev machine works without system packages.

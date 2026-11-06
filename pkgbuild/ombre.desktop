@@ -1,11 +1,11 @@
 [Desktop Entry]
 Type=Application
-Name=gradgen
+Name=Ombre
 GenericName=Wallpaper Generator
 Comment=Generate gradient wallpapers from your theme colours
-Exec=gradgen %f
-Icon=gradgen
+Exec=ombre %f
+Icon=ombre
 Terminal=false
 Categories=Graphics;Utility;
 Keywords=wallpaper;background;gradient;theme;
-StartupWMClass=gradgen
+StartupWMClass=ombre

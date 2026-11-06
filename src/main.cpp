@@ -1,4 +1,4 @@
-// gradgen — generate gradient wallpapers from the desktop's own colours.
+// Ombre — generate gradient wallpapers from the desktop's own colours.
 
 #include <QGuiApplication>
 #include <QIcon>
@@ -13,14 +13,14 @@
 
 int main(int argc, char *argv[]) {
     QGuiApplication app(argc, argv);
-    app.setApplicationName("gradgen");
+    app.setApplicationName("ombre");
     app.setApplicationVersion("0.1.0");
     app.setOrganizationName("Omarchy");
 
-    // Matches the window to gradgen.desktop, so the compositor (Wayland app_id)
+    // Matches the window to ombre.desktop, so the compositor (Wayland app_id)
     // and the launcher pick up the installed icon.
-    app.setDesktopFileName("gradgen");
-    app.setWindowIcon(QIcon::fromTheme("gradgen"));
+    app.setDesktopFileName("ombre");
+    app.setWindowIcon(QIcon::fromTheme("ombre"));
 
     QQuickStyle::setStyle("Material");
 

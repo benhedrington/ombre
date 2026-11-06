@@ -1,12 +1,12 @@
 QT += core gui qml quick quickcontrols2 dbus
 
 CONFIG += c++17 release
-TARGET = gradgen
+TARGET = ombre
 TEMPLATE = app
 
 # The dev build finds backend/gradgen.py in the source tree. The installed
-# package puts it in /usr/share/gradgen, which QStandardPaths finds first.
-DEFINES += GRADGEN_SOURCE_DIR=\\\"$$PWD\\\"
+# package puts it in /usr/share/ombre, which QStandardPaths finds first.
+DEFINES += OMBRE_SOURCE_DIR=\\\"$$PWD\\\"
 
 HEADERS += \
     src/backend.h \

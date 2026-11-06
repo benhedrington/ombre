@@ -37,7 +37,7 @@ Backend::Backend(const QString &currentDirectory, QObject *parent)
       m_previewDirectory(QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + "/preview"),
       m_seed(QRandomGenerator::global()->bounded(1, 1000000)) {
     m_status = tr("Press Space to generate");
-    const QString mode = qEnvironmentVariable("GRADGEN_PALETTE_MODE");
+    const QString mode = qEnvironmentVariable("OMBRE_PALETTE_MODE");
     if (!mode.isEmpty() && paletteModes().contains(mode))
         m_paletteMode = mode;
     refreshTheme();
@@ -161,7 +161,7 @@ void Backend::generate() {
     refreshTheme();
     const QString script = scriptPath();
     if (script.isEmpty()) {
-        fail(tr("Could not find gradgen.py. Install the package or set GRADGEN_SCRIPT."));
+        fail(tr("Could not find gradgen.py. Reinstall Ombre or set GRADGEN_SCRIPT."));
         return;
     }
 
@@ -295,7 +295,7 @@ void Backend::apply(const QString &path) {
 
     // The preview directory is wiped whenever a new set is generated, so keep
     // the chosen image somewhere stable before pointing the desktop at it.
-    const QString directory = QDir::homePath() + "/.local/share/gradgen/applied";
+    const QString directory = QDir::homePath() + "/.local/share/ombre/applied";
     if (!QDir().mkpath(directory)) {
         fail(tr("Could not create %1").arg(directory));
         return;
@@ -341,7 +341,7 @@ void Backend::saveSet() {
 
     int saved = 0;
     for (int i = 0; i < static_cast<int>(m_previews.size()); ++i) {
-        const QString name = QString("gradgen-%1-%2-%3-%4.webp")
+        const QString name = QString("ombre-%1-%2-%3-%4.webp")
                                  .arg(m_paletteMode, m_style, QString::number(m_lastSeed))
                                  .arg(i + 1, 2, 10, QChar('0'));
         const QString target = destination + "/" + name;
@@ -483,7 +483,7 @@ QString Backend::scriptPath() const {
         return override;
 
     const QString installed =
-        QStandardPaths::locate(QStandardPaths::GenericDataLocation, "gradgen/gradgen.py");
+        QStandardPaths::locate(QStandardPaths::GenericDataLocation, "ombre/gradgen.py");
     if (!installed.isEmpty())
         return installed;
 
@@ -492,8 +492,8 @@ QString Backend::scriptPath() const {
     if (QFileInfo::exists(besideBuild))
         return besideBuild;
 
-#ifdef GRADGEN_SOURCE_DIR
-    const QString source = QStringLiteral(GRADGEN_SOURCE_DIR) + "/backend/gradgen.py";
+#ifdef OMBRE_SOURCE_DIR
+    const QString source = QStringLiteral(OMBRE_SOURCE_DIR) + "/backend/gradgen.py";
     if (QFileInfo::exists(source))
         return source;
 #endif

@@ -1,4 +1,4 @@
-pkgname=gradgen
+pkgname=ombre
 pkgver=0.1.0
 pkgrel=1
 pkgdesc='Generate gradient wallpapers from your Omarchy theme colours'
@@ -16,9 +16,9 @@ build() {
 
 package() {
   cd "$startdir/.."
-  install -Dm755 build/gradgen "$pkgdir/usr/bin/gradgen"
-  install -Dm644 backend/gradgen.py "$pkgdir/usr/share/gradgen/gradgen.py"
+  install -Dm755 build/ombre "$pkgdir/usr/bin/ombre"
+  install -Dm644 backend/gradgen.py "$pkgdir/usr/share/ombre/gradgen.py"
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
-  install -Dm644 "$startdir/gradgen.svg" "$pkgdir/usr/share/icons/hicolor/scalable/apps/gradgen.svg"
-  install -Dm644 "$startdir/gradgen.desktop" "$pkgdir/usr/share/applications/gradgen.desktop"
+  install -Dm644 "$startdir/ombre.svg" "$pkgdir/usr/share/icons/hicolor/scalable/apps/ombre.svg"
+  install -Dm644 "$startdir/ombre.desktop" "$pkgdir/usr/share/applications/ombre.desktop"
 }

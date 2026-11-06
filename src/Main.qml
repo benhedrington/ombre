@@ -139,10 +139,13 @@ ApplicationWindow {
                             id: sizeBox
                             focusPolicy: Qt.NoFocus
                             font.pixelSize: 12
-                            Layout.preferredWidth: 125
-                            model: ["1920×1200", "1920×1080", "2560×1600", "2560×1440",
-                                     "3440×1440", "3840×2400", "3840×2160", "5120×2880",
-                                     "2256×1504", "3456×2234", "5120×1440"]
+                            Layout.preferredWidth: 170
+                            model: ["1920×1080 · 16:9", "1920×1200 · 16:10",
+                                     "2256×1504 · 3:2", "2560×1440 · 16:9",
+                                     "2560×1600 · 16:10", "3440×1440 · 21:9",
+                                     "5120×1440 · 32:9", "3456×2234 · 16:10",
+                                     "3840×2160 · 16:9", "3840×2400 · 16:10",
+                                     "5120×2880 · 16:9"]
                             currentIndex: backend.sizes.indexOf(backend.size)
                             onActivated: function(index) { backend.size = backend.sizes[index] }
                         }

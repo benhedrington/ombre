@@ -75,8 +75,9 @@ QStringList Backend::paletteModes() const {
 }
 
 QStringList Backend::sizes() const {
-    return {"wuxga", "hd", "laptop-1610", "qhd", "uw-1440", "16x10-4k",
-            "4k", "5k", "framework-13", "macbook-pro-16", "suw"};
+    // Smallest to largest by pixel count, so the dropdown reads as one scale.
+    return {"hd", "wuxga", "framework-13", "qhd", "laptop-1610", "uw-1440",
+            "suw", "macbook-pro-16", "4k", "16x10-4k", "5k"};
 }
 
 QStringList Backend::paletteColors() const {

@@ -3,3 +3,7 @@
 /pkgbuild/src/
 *.pkg.tar.*
 .venv/
+/packaging/aur/src/
+/packaging/aur/pkg/
+/packaging/omarchy-pkgs/src/
+/packaging/omarchy-pkgs/pkg/

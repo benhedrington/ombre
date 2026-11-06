@@ -140,7 +140,9 @@ ApplicationWindow {
                             focusPolicy: Qt.NoFocus
                             font.pixelSize: 12
                             Layout.preferredWidth: 125
-                            model: ["1920×1200", "1920×1080", "3840×2400", "3840×2160"]
+                            model: ["1920×1200", "1920×1080", "2560×1600", "2560×1440",
+                                     "3440×1440", "3840×2400", "3840×2160", "5120×2880",
+                                     "2256×1504", "3456×2234", "5120×1440"]
                             currentIndex: backend.sizes.indexOf(backend.size)
                             onActivated: function(index) { backend.size = backend.sizes[index] }
                         }

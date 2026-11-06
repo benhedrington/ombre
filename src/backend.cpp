@@ -75,7 +75,8 @@ QStringList Backend::paletteModes() const {
 }
 
 QStringList Backend::sizes() const {
-    return {"wuxga", "hd", "16x10-4k", "4k"};
+    return {"wuxga", "hd", "laptop-1610", "qhd", "uw-1440", "16x10-4k",
+            "4k", "5k", "framework-13", "macbook-pro-16", "suw"};
 }
 
 QStringList Backend::paletteColors() const {

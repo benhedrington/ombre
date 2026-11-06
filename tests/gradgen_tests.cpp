@@ -127,6 +127,14 @@ private slots:
         qunsetenv("GRADGEN_PALETTE_MODE");
     }
 
+    void sizesCoverTheCommonDeskAspectRatios()
+    {
+        QTemporaryDir dir;
+        Backend backend(dir.path());
+        for (const auto &id : {"wuxga", "laptop-1610", "qhd", "uw-1440", "4k", "5k", "framework-13", "suw"})
+            QVERIFY2(backend.sizes().contains(id), id);
+    }
+
     void grainIsClamped()
     {
         QTemporaryDir dir;

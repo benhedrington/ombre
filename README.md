@@ -52,7 +52,9 @@ next set will use.
 - **Style** — `Any`, `Linear`, `Glow`, `Aurora`, `Mesh`, `Beam`, `Orb`, `Horizon`, or `Split`.
   Beam is shafts of light, Orb a single glow, Horizon a band on a vertical sky,
   Split a soft diagonal seam.
-- **Size** — 1920×1200 (this panel), 1920×1080, 3840×2400, 3840×2160.
+- **Size** — 1920×1200, 1920×1080, 2560×1600, 2560×1440, 3440×1440,
+  3840×2400, 3840×2160, 5120×2880, 2256×1504 (Framework 13), 3456×2234
+  (MacBook Pro 16), 5120×1440 (32:9).
 - **Count** — 3 to 12 candidates per set.
 - **Grain** — film grain (0 to 0.06, default 0.01) that doubles as dither, so
   the ramps do not band. 0 is perfectly smooth and may show bands.

@@ -302,7 +302,7 @@ def main():
     p.add_argument("--palette",
                    help="comma-separated hex colors, e.g. '#102,#f80,#0cf'; "
                         "separate whole palettes with ';' to vary across the batch")
-    p.add_argument("--grain", type=float, default=0.025)
+    p.add_argument("--grain", type=float, default=0.01)
     p.add_argument("--warp", type=float, help="override warp strength (0-1)")
     p.add_argument("-f", "--format", choices=("png", "webp", "jpg"),
                    default="png", help="output format (default: png)")

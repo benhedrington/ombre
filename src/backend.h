@@ -106,7 +106,7 @@ private:
     QString m_previewDirectory;
 
     QString m_style = "any";
-    double m_grain = 0.025;
+    double m_grain = 0.01;
     QString m_size = "wuxga";
     int m_count = 6;
     QString m_paletteMode = "theme";

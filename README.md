@@ -54,7 +54,7 @@ next set will use.
   Split a soft diagonal seam.
 - **Size** — 1920×1200 (this panel), 1920×1080, 3840×2400, 3840×2160.
 - **Count** — 3 to 12 candidates per set.
-- **Grain** — film grain (0 to 0.06, default 0.025) that doubles as dither, so
+- **Grain** — film grain (0 to 0.06, default 0.01) that doubles as dither, so
   the ramps do not band. 0 is perfectly smooth and may show bands.
 
 ## What it writes

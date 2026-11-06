@@ -90,14 +90,6 @@ void Backend::setStyle(const QString &style) {
     emit styleChanged();
 }
 
-void Backend::setSoft(bool soft) {
-    if (soft == m_soft)
-        return;
-    m_soft = soft;
-    emit softChanged();
-    emit paletteChanged();
-}
-
 void Backend::setGrain(double grain) {
     grain = qBound(0.0, grain, 0.1);
     if (qFuzzyCompare(grain, m_grain))
@@ -191,12 +183,11 @@ void Backend::generate() {
         "-o", m_previewDirectory,
     };
     if (m_paletteMode == "surprise") {
-        arguments << "--palette-seed" << QString::number(m_seed) << "--palette-vary" << "--dim";
+        arguments << "--palette-seed" << QString::number(m_seed)
+                  << "--palette-vary" << "--soft" << "--dim";
     } else {
         arguments << "--palette" << paletteString();
     }
-    if (m_soft)
-        arguments << "--soft";
 
     startGeneration(python, arguments);
 }
@@ -383,12 +374,10 @@ QStringList Backend::batchPalettes() const {
         last = get(families[index].last, accent);
     }
 
-    // Soft pulls the accents toward the theme's lighter background, which
-    // lowers contrast and saturation without changing the hue family.
-    if (m_soft) {
-        first = mixedColor(first, lighter, 0.35);
-        last = mixedColor(last, lighter, 0.35);
-    }
+    // Wallpapers sit behind everything, so the accent is pulled toward the
+    // theme's lighter background: still the same hue, lower contrast.
+    first = mixedColor(first, lighter, 0.35);
+    last = mixedColor(last, lighter, 0.35);
 
     // The set sweeps from the first accent to the second, so the six images
     // belong together without being the same colour.

@@ -22,28 +22,26 @@ private slots:
               "bright_cyan = \"#0db9d7\"\n");
 
         Backend backend(dir.path());
-        backend.setSoft(false);
         backend.setSeed(0);
         const QStringList palettes = backend.paletteString().split(';');
         QCOMPARE(palettes.size(), 6);
-        QCOMPARE(palettes.first(), QString("#0e0e14,#1a1b26,#24283b,#7aa2f7"));
+        QCOMPARE(palettes.first(), QString("#0e0e14,#1a1b26,#24283b,#5c77b5"));
         QVERIFY(palettes.first() != palettes.last());
 
         // Three base tones plus the two ends of the accent sweep.
         const QStringList swatches = backend.paletteColors();
         QCOMPARE(swatches.size(), 5);
-        QCOMPARE(swatches.last(), QString("#0db9d7"));
+        QCOMPARE(swatches.last(), QString("#1586a0"));
     }
 
     void paletteFallsBackWithoutATheme()
     {
         QTemporaryDir dir;
         Backend backend(dir.path());
-        backend.setSoft(false);
         backend.setSeed(0);
         const QStringList palettes = backend.paletteString().split(';');
         QCOMPARE(palettes.size(), backend.count());
-        QCOMPARE(palettes.first(), QString("#13141c,#1a1b26,#24283b,#7aa2f7"));
+        QCOMPARE(palettes.first(), QString("#13141c,#1a1b26,#24283b,#5c77b5"));
     }
 
     void paletteModesUseTheirOwnAccents()
@@ -58,11 +56,10 @@ private slots:
               "bright_yellow = \"#ffff00\"\n");
 
         Backend backend(dir.path());
-        backend.setSoft(false);
         backend.setPaletteMode("warm");
         const QStringList palettes = backend.paletteString().split(';');
-        QCOMPARE(palettes.first(), QString("#101010,#111111,#222222,#ff0000"));
-        QCOMPARE(palettes.last(), QString("#101010,#111111,#222222,#ffff00"));
+        QCOMPARE(palettes.first(), QString("#101010,#111111,#222222,#b20c0c"));
+        QCOMPARE(palettes.last(), QString("#101010,#111111,#222222,#b2b20c"));
         QCOMPARE(backend.paletteMode(), QString("warm"));
     }
 
@@ -105,7 +102,7 @@ private slots:
         QVERIFY(palettes.first() != palettes.last());
     }
 
-    void softPullsTheAccentTowardTheBackground()
+    void accentsAreMutedTowardTheBackground()
     {
         QTemporaryDir dir;
         QDir(dir.path()).mkpath("theme");
@@ -117,11 +114,7 @@ private slots:
 
         Backend backend(dir.path());
         backend.setPaletteMode("warm");
-        backend.setSoft(false);
-        const QString sharp = backend.paletteColors().last();
-        backend.setSoft(true);
-        const QString calm = backend.paletteColors().last();
-        QVERIFY(sharp != calm);
+        QCOMPARE(backend.paletteColors().last(), QString("#b2b20c"));
     }
 
     void grainIsClamped()

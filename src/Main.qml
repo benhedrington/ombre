@@ -85,7 +85,7 @@ ApplicationWindow {
                 }
             }
 
-            // One row of controls: palette source, style, size, soft, count.
+            // Controls: palette source, style, size, count, grain.
             Rectangle {
                 Layout.fillWidth: true
                 Layout.preferredHeight: controls.implicitHeight + 24
@@ -135,15 +135,6 @@ ApplicationWindow {
                             model: ["1920×1200", "1920×1080", "3840×2400", "3840×2160"]
                             currentIndex: backend.sizes.indexOf(backend.size)
                             onActivated: backend.size = backend.sizes[index]
-                        }
-
-                        CheckBox {
-                            focusPolicy: Qt.NoFocus
-                            text: qsTr("Soft")
-                            checked: backend.soft
-                            onToggled: backend.soft = checked
-                            ToolTip.visible: hovered
-                            ToolTip.text: qsTr("Calmer accents, pulled toward the background")
                         }
 
                         Item { Layout.fillWidth: true }

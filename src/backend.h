@@ -23,7 +23,6 @@ class Backend : public QObject {
     Q_PROPERTY(QStringList sizes READ sizes CONSTANT)
 
     Q_PROPERTY(QString style READ style WRITE setStyle NOTIFY styleChanged)
-    Q_PROPERTY(bool soft READ soft WRITE setSoft NOTIFY softChanged)
     Q_PROPERTY(double grain READ grain WRITE setGrain NOTIFY grainChanged)
     Q_PROPERTY(QString size READ size WRITE setSize NOTIFY sizeChanged)
     Q_PROPERTY(int count READ count WRITE setCount NOTIFY countChanged)
@@ -46,7 +45,6 @@ public:
     QStringList sizes() const;
 
     QString style() const { return m_style; }
-    bool soft() const { return m_soft; }
     double grain() const { return m_grain; }
     QString size() const { return m_size; }
     int count() const { return m_count; }
@@ -54,7 +52,6 @@ public:
     int seed() const { return m_seed; }
 
     void setStyle(const QString &style);
-    void setSoft(bool soft);
     void setGrain(double grain);
     void setSize(const QString &size);
     void setCount(int count);
@@ -80,7 +77,6 @@ signals:
     void themeNameChanged();
     void lastSeedChanged();
     void styleChanged();
-    void softChanged();
     void grainChanged();
     void sizeChanged();
     void countChanged();
@@ -106,7 +102,6 @@ private:
     QString m_previewDirectory;
 
     QString m_style = "any";
-    bool m_soft = true;
     double m_grain = 0.025;
     QString m_size = "wuxga";
     int m_count = 6;

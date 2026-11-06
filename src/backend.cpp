@@ -180,6 +180,9 @@ void Backend::generate() {
     }
 
     m_lastSeed = m_seed;
+    m_batchSeed = m_seed;
+    m_batchPaletteMode = m_paletteMode;
+    m_batchStyle = m_style;
     m_usedUv = false;
     m_previews.clear();
     emit previewsChanged();
@@ -293,28 +296,36 @@ void Backend::apply(const QString &path) {
         return;
     }
 
-    // The preview directory is wiped whenever a new set is generated, so keep
-    // the chosen image somewhere stable before pointing the desktop at it.
-    const QString directory = QDir::homePath() + "/.local/share/ombre/applied";
-    if (!QDir().mkpath(directory)) {
-        fail(tr("Could not create %1").arg(directory));
+    // Anything set becomes part of the active theme's rotation, not just the
+    // current symlink. The preview cache is wiped on the next generation, so
+    // the theme folder is also the stable copy.
+    refreshTheme();
+    const QString destination = QDir::homePath() + "/.config/omarchy/backgrounds/" + themeSlug();
+    if (!QDir().mkpath(destination)) {
+        fail(tr("Could not create %1").arg(destination));
         return;
     }
-    QString stable = path;
-    if (QFileInfo(path).absolutePath() != directory) {
-        stable = directory + "/" + QFileInfo(path).fileName();
-        QFile::remove(stable);
-        if (!QFile::copy(path, stable)) {
-            fail(tr("Could not keep a copy of %1").arg(QFileInfo(path).fileName()));
+
+    int index = m_previews.indexOf(path);
+    if (index < 0)
+        index = 0;
+    const QString target = destination + "/" + savedName(index);
+    if (QFileInfo(path).absoluteFilePath() != target) {
+        QFile::remove(target);
+        if (!QFile::copy(path, target)) {
+            fail(tr("Could not add the wallpaper to %1").arg(destination));
             return;
         }
     }
+
+    if (const QString cache = QStandardPaths::findExecutable("omarchy-theme-bg-cache"); !cache.isEmpty())
+        QProcess::startDetached(cache, {});
 
     if (!m_action) {
         m_action = new QProcess(this);
         connect(m_action, &QProcess::finished, this, [this](int code, QProcess::ExitStatus status) {
             if (code == 0 && status == QProcess::NormalExit) {
-                setStatus(tr("Background applied"));
+                setStatus(tr("Background applied · saved to %1").arg(themeName()));
                 return;
             }
             const QString message = lastErrorLine(m_action->readAllStandardError());
@@ -323,7 +334,7 @@ void Backend::apply(const QString &path) {
     }
     if (m_action->state() != QProcess::NotRunning)
         m_action->kill();
-    m_action->start(command, {stable});
+    m_action->start(command, {target});
 }
 
 void Backend::saveSet() {
@@ -341,10 +352,7 @@ void Backend::saveSet() {
 
     int saved = 0;
     for (int i = 0; i < static_cast<int>(m_previews.size()); ++i) {
-        const QString name = QString("ombre-%1-%2-%3-%4.webp")
-                                 .arg(m_paletteMode, m_style, QString::number(m_lastSeed))
-                                 .arg(i + 1, 2, 10, QChar('0'));
-        const QString target = destination + "/" + name;
+        const QString target = destination + "/" + savedName(i);
         QFile::remove(target);
         if (QFile::copy(m_previews[i], target))
             ++saved;
@@ -475,6 +483,12 @@ QString Backend::themeSlug() const {
     slug.replace(QRegularExpression("[^a-z0-9._-]+"), "-");
     slug.remove(QRegularExpression("^-+|-+$"));
     return slug.isEmpty() ? QStringLiteral("custom") : slug;
+}
+
+QString Backend::savedName(int index) const {
+    return QString("ombre-%1-%2-%3-%4.webp")
+        .arg(m_batchPaletteMode, m_batchStyle, QString::number(m_batchSeed))
+        .arg(index + 1, 2, 10, QChar('0'));
 }
 
 QString Backend::scriptPath() const {

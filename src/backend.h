@@ -98,6 +98,7 @@ private:
     void setStatus(const QString &status);
     void setBusy(bool busy);
     QString themeSlug() const;
+    QString savedName(int index) const;
 
     QString m_currentDirectory;
     QString m_status;
@@ -113,6 +114,9 @@ private:
     QStringList m_customColors;
     int m_seed = 1;
     int m_lastSeed = 0;
+    int m_batchSeed = 1;
+    QString m_batchPaletteMode = "theme";
+    QString m_batchStyle = "any";
     QString m_themeName = "Omarchy";
 
     QProcess *m_generate = nullptr;

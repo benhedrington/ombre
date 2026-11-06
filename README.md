@@ -61,13 +61,11 @@ next set will use.
 
 ## What it writes
 
-- **Apply** keeps a copy of the chosen image in
-  `~/.local/share/ombre/applied/` (the preview cache is wiped on the next
-  generation) and runs `omarchy-theme-bg-set`, the same command the Omarchy
-  menu and `omarchy theme bg next` use.
-- **Save set** copies the candidates to
-  `~/.config/omarchy/backgrounds/<theme-slug>/` and refreshes the background
-  switcher thumbnails. Files are named
+- **Apply** copies the chosen image into
+  `~/.config/omarchy/backgrounds/<theme-slug>/` under the same name Save set
+  uses, refreshes the switcher thumbnails, and runs `omarchy-theme-bg-set`.
+  So anything you set is also added to the active theme's rotation.
+- **Save set** copies all candidates to the same folder. Files are named
   `ombre-<palette>-<style>-<seed>-<n>.webp`; the seed is what makes a set
   reproducible.
 - Candidate images live in the cache

@@ -141,6 +141,7 @@ void Backend::setSeed(int seed) {
     if (seed == m_seed)
         return;
     m_seed = seed;
+    m_initialPalette = false;
     emit seedChanged();
     emit paletteChanged();
 }
@@ -150,7 +151,12 @@ void Backend::reroll() {
 }
 
 void Backend::generateNew() {
-    reroll();
+    if (m_busy)
+        return;
+    if (m_hasGenerated) {
+        m_initialPalette = false;
+        reroll();
+    }
     generate();
 }
 
@@ -242,6 +248,7 @@ void Backend::generationFinished(int exitCode, QProcess::ExitStatus status) {
         }
         for (const auto &file : files)
             m_previews << file.absoluteFilePath();
+        m_hasGenerated = true;
         emit previewsChanged();
         emit lastSeedChanged();
         setBusy(false);
@@ -407,6 +414,12 @@ QStringList Backend::batchPalettes() const {
     } else if (m_paletteMode == "warm") {
         first = get("red", "#f7768e");
         last = get("bright_yellow", "#ff9e64");
+    } else if (m_initialPalette) {
+        // The first set uses the theme's own accent, so the header swatches
+        // describe exactly what the next Generate will produce.
+        const QString accent = get("accent", "#7aa2f7");
+        first = accent;
+        last = get("bright_cyan", accent);
     } else {
         // Theme mode cycles the theme's own accent families by seed, so every
         // Space is a different hue while the dark base stays recognisable.

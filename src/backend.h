@@ -122,5 +122,7 @@ private:
     QProcess *m_generate = nullptr;
     QProcess *m_action = nullptr;
     bool m_usedUv = false;
+    bool m_initialPalette = true;
+    bool m_hasGenerated = false;
     QString m_actionPath;
 };

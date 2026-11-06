@@ -34,6 +34,24 @@ private slots:
         QCOMPARE(swatches.last(), QString("#1586a0"));
     }
 
+    void firstPaletteUsesTheThemeAccent()
+    {
+        QTemporaryDir dir;
+        QDir(dir.path()).mkpath("theme");
+        write(dir.path() + "/theme/colors.toml",
+              "darker_background = \"#000000\"\n"
+              "background = \"#111111\"\n"
+              "lighter_background = \"#222222\"\n"
+              "accent = \"#ff0000\"\n"
+              "blue = \"#0000ff\"\n"
+              "bright_cyan = \"#00ff00\"\n");
+
+        Backend backend(dir.path());
+        const QStringList swatches = backend.paletteColors();
+        QCOMPARE(swatches.at(3), QString("#b20c0c"));
+        QCOMPARE(swatches.last(), QString("#0cb20c"));
+    }
+
     void paletteFallsBackWithoutATheme()
     {
         QTemporaryDir dir;

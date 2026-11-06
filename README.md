@@ -38,9 +38,10 @@ next set will use.
 
 ## Controls
 
-- **Palette** — `Theme` keeps the theme's dark background shades but rotates
-  through its accent families (blue, purple, cyan, red, yellow, green) on every
-  generation. `Cool`, `Warm` and `Mono` are fixed families. `Custom` gives you
+- **Palette** — `Theme` keeps the theme's dark background shades. The first set
+  uses the theme's own accent; each later set rotates through its accent
+  families (blue, purple, cyan, red, yellow, green). `Cool`, `Warm` and `Mono`
+  are fixed families. `Custom` gives you
   four swatches — background, surface, accent A, accent B — and the set sweeps
   from A to B. Click a swatch to open the colour picker; the choice is saved.
   `Surprise` hands the palette to the renderer, so it can land outside the theme.

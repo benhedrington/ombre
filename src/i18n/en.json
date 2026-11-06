@@ -1,0 +1,6 @@
+{
+  "%n wallpapers": { "one": "%n wallpaper", "other": "%n wallpapers" },
+  "%n wallpapers · seed %1": { "one": "%n wallpaper · seed %1", "other": "%n wallpapers · seed %1" },
+  "Generating %n wallpapers…": { "one": "Generating %n wallpaper…", "other": "Generating %n wallpapers…" },
+  "Saved %n wallpapers to %1": { "one": "Saved %n wallpaper to %1", "other": "Saved %n wallpapers to %1" }
+}

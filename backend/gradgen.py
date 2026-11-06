@@ -13,9 +13,11 @@ Examples:
   ./gradgen.py -s 3000x2000            # custom size
   ./gradgen.py --seed 42 --style aurora
   ./gradgen.py --palette "#1a2a6c,#b21f1f,#fdbb2d"
+  ./gradgen.py --palette "p1;p2;p3"    # one palette per image, cycled
   ./gradgen.py -s 4k -f webp -q 90     # smaller files for wallpapers
   ./gradgen.py --soft                  # calmer, lower-contrast palettes
   ./gradgen.py --palette-seed 7        # one shared palette for the whole batch
+  ./gradgen.py --palette-seed 7 --palette-vary  # same family, hue walks the set
   ./gradgen.py --interp rgb            # legacy sRGB blending instead of OKLab
 """
 import argparse, colorsys, math, os, random, time
@@ -89,11 +91,12 @@ def oklab_to_rgb(lab):
     return linear_to_srgb(np.stack([r, g, b], axis=-1))
 
 
-def make_palette(rng, n, soft=False):
+def make_palette(rng, n, soft=False, dim=False):
     """Pick a harmony scheme and return n colors (float RGB 0-1).
 
     soft biases toward analogous/split-complement hues, tighter saturation and
     a gentler brightness ramp, so the result reads calm instead of punchy.
+    dim scales the whole ramp down for wallpapers behind a dark desktop.
     """
     base = rng.random()
     if soft:
@@ -118,12 +121,23 @@ def make_palette(rng, n, soft=False):
             v = 0.38 + 0.42 * ratio + rng.uniform(-0.04, 0.04)
         else:
             v = 0.18 + 0.8 * ratio + rng.uniform(-0.08, 0.08)
+        if dim:
+            v *= 0.62
         cols.append(hsv(h, s, v))
     # order by brightness so ramps flow dark->light (avoids muddy mid-mixes)
     cols.sort(key=lambda c: c.sum())
     if rng.random() < 0.5:
         cols.reverse()
     return cols
+
+
+def shift_palette(cols, amount):
+    """Rotate every colour's hue by `amount`, keeping saturation and value."""
+    out = []
+    for color in cols:
+        h, s, v = colorsys.rgb_to_hsv(*color)
+        out.append(np.array(colorsys.hsv_to_rgb((h + amount) % 1.0, s, v)))
+    return out
 
 
 def grid(w, h):
@@ -169,10 +183,10 @@ def warp_field(X, Y, rng, strength):
 
 
 def render(w, h, rng, style, palette=None, grain=0.025, warp=None, soft=False,
-           interp="oklab"):
+           interp="oklab", dim=False):
     if style == "any":
         style = rng.choice(["linear", "glow", "aurora", "mesh"])
-    cols = palette or make_palette(rng, rng.randint(3, 5), soft)
+    cols = palette or make_palette(rng, rng.randint(3, 5), soft, dim)
     X, Y = grid(w, h)
 
     if warp is None:
@@ -238,7 +252,9 @@ def main():
     p.add_argument("-o", "--out", default="out")
     p.add_argument("--style", choices=STYLES, default="any")
     p.add_argument("--seed", type=int, help="base seed (image i uses seed+i)")
-    p.add_argument("--palette", help="comma-separated hex colors, e.g. '#102,#f80,#0cf'")
+    p.add_argument("--palette",
+                   help="comma-separated hex colors, e.g. '#102,#f80,#0cf'; "
+                        "separate whole palettes with ';' to vary across the batch")
     p.add_argument("--grain", type=float, default=0.025)
     p.add_argument("--warp", type=float, help="override warp strength (0-1)")
     p.add_argument("-f", "--format", choices=("png", "webp", "jpg"),
@@ -247,10 +263,14 @@ def main():
                    help="quality for webp/jpg, 1-100 (default: 92)")
     p.add_argument("--soft", action="store_true",
                    help="calmer palettes: closer hues, lower saturation, gentler contrast")
+    p.add_argument("--dim", action="store_true",
+                   help="darken generated palettes for a wallpaper behind a dark desktop")
     p.add_argument("--interp", choices=("oklab", "rgb"), default="oklab",
                    help="color interpolation space (default: oklab)")
     p.add_argument("--palette-seed", type=int,
                    help="generate one palette from this seed and reuse it for the whole batch")
+    p.add_argument("--palette-vary", action="store_true",
+                   help="with --palette-seed, shift the palette's hue across the batch")
     a = p.parse_args()
 
     if a.list_sizes:
@@ -266,27 +286,42 @@ def main():
         except ValueError:
             p.error(f"unknown size '{a.size}' (use WxH or a preset; --list-sizes)")
     os.makedirs(a.out, exist_ok=True)
+    palettes = None
     if a.palette:
+        palettes = []
         try:
-            pal = [hexc(c) for c in a.palette.split(",")]
+            for chunk in a.palette.split(";"):
+                chunk = chunk.strip()
+                if not chunk:
+                    continue
+                colors = [hexc(c) for c in chunk.split(",")]
+                if len(colors) < 2:
+                    p.error("--palette needs at least 2 colors per palette")
+                palettes.append(colors)
         except ValueError as e:
             p.error(str(e))
-        if len(pal) < 2:
+        if not palettes:
             p.error("--palette needs at least 2 colors")
-    else:
-        pal = None
-    # Optional cohesive batch: one palette for every image, chosen from its own
-    # RNG so --seed still controls composition independently.
-    if pal is None and a.palette_seed is not None:
+
+    # A palette seed makes a cohesive family. --palette-vary walks the hue
+    # across the batch, so the six images read as one set without being clones.
+    batch_palettes = palettes
+    if batch_palettes is None and a.palette_seed is not None:
         prng = random.Random(a.palette_seed)
-        pal = make_palette(prng, prng.randint(3, 5), a.soft)
+        base_palette = make_palette(prng, prng.randint(3, 5), a.soft, a.dim)
+        if a.palette_vary:
+            batch_palettes = [shift_palette(base_palette, i * 0.02) for i in range(a.count)]
+        else:
+            batch_palettes = [base_palette]
+
     ext = "jpg" if a.format in ("jpg", "jpeg") else a.format
     base = a.seed if a.seed is not None else time.time_ns() % (2 ** 32)
     ptag = f"p{a.palette_seed}_" if a.palette_seed is not None else ""
     for i in range(a.count):
         seed = base + i
+        pal = batch_palettes[i % len(batch_palettes)] if batch_palettes else None
         img, style = render(w, h, random.Random(seed), a.style, pal, a.grain,
-                            a.warp, a.soft, a.interp)
+                            a.warp, a.soft, a.interp, a.dim)
         path = os.path.join(a.out, f"grad_{'soft_' if a.soft else ''}{style}_{ptag}{seed}_{w}x{h}.{ext}")
         if ext == "png":
             img.save(path, optimize=True)

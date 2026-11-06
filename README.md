@@ -1,0 +1,93 @@
+# gradgen
+
+![gradgen](docs/screenshot.png)
+
+Gradient wallpapers from your desktop's own colours. Press Space for a fresh
+set, arrow through the candidates, Enter to apply one.
+
+It reads `~/.local/state/omarchy/current/theme/colors.toml`, so the wallpapers
+match the theme you are running instead of a fixed palette. The heavy lifting
+is the same Python renderer as `gradgen.py`: a base ramp, soft glows, optional
+flow warp, vignette, and grain to stop banding.
+
+## Build and run
+
+```sh
+bin/build
+build/gradgen
+```
+
+`bin/test` builds and runs the backend tests offscreen. `bin/install` builds
+the package with `makepkg -fsi` so it appears in the app launcher.
+
+## Shortcuts
+
+| Key | Action |
+|-----|--------|
+| Space | Generate a new set |
+| Enter | Apply the selected wallpaper |
+| S | Save the set to this theme's background folder |
+| Arrows | Move between candidates |
+| ? | Show the shortcuts |
+| Q | Quit |
+
+Double-clicking a candidate applies it. The palette swatches in the header are
+the four colours the next set will use.
+
+## Controls
+
+- **Palette** — `Theme` keeps the theme's dark background shades but rotates
+  through its accent families (blue, purple, cyan, red, yellow, green) on every
+  generation. `Cool`, `Warm` and `Mono` are fixed families. `Surprise` hands the
+  palette to the renderer, so it can land outside the theme.
+- The set sweeps from the first accent to the second, so the images vary within
+  a family instead of being six copies. The header swatches show both ends.
+- **Style** — `Any`, `Linear`, `Glow`, `Aurora`, or `Mesh`.
+- **Size** — 1920×1200 (this panel), 1920×1080, 3840×2400, 3840×2160.
+- **Soft** — calmer hues and contrast. On by default.
+- **Count** — 3 to 12 candidates per set.
+
+## What it writes
+
+- **Apply** runs `omarchy-theme-bg-set`, the same command the Omarchy menu and
+  `omarchy theme bg next` use. It only changes the background symlink.
+- **Save set** copies the candidates to
+  `~/.config/omarchy/backgrounds/<theme-slug>/` and refreshes the background
+  switcher thumbnails. Files are named
+  `gradgen-<palette>-<style>-<seed>-<n>.webp`; the seed is what makes a set
+  reproducible.
+- Candidate images live in the cache
+  (`~/.cache/gradgen/preview/`) and are replaced on every generation.
+
+Nothing else on disk is touched, and the app never edits Omarchy's packaged
+files.
+
+## Renderer
+
+`backend/gradgen.py` is the standalone generator, installed to
+`/usr/share/gradgen/gradgen.py`. The app finds it there, or next to the build,
+or through `GRADGEN_SCRIPT`. It needs Python 3 with `numpy` and `Pillow`; if the
+system Python lacks them, the app retries through `uv run --with numpy --with
+pillow` so a dev machine works without system packages.
+
+Run the renderer by hand for anything the app does not cover:
+
+```sh
+python3 backend/gradgen.py -n 6 -s wuxga -f webp --style aurora \
+  --palette "#1a1b26,#24283b,#7aa2f7" -o out
+
+# One palette per image, cycled in order
+python3 backend/gradgen.py --palette "#13141c,#1a1b26,#24283b,#7aa2f7;#13141c,#1a1b26,#24283b,#0db9d7"
+
+# One generated family, hue shifted across the batch
+python3 backend/gradgen.py --palette-seed 7 --palette-vary --soft --dim
+```
+
+`--palette-vary` works with `--palette-seed`, and `--dim` darkens a generated
+palette for a wallpaper behind a dark desktop.
+
+## Credits
+
+The theme and translation plumbing follows Omarchy's app templates from
+Omacut and Monologue (MIT, David Heinemeier Hansson). The renderer is the
+original `gradgen.py`.

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=gradgen
+GenericName=Wallpaper Generator
+Comment=Generate gradient wallpapers from your theme colours
+Exec=gradgen %f
+Icon=gradgen
+Terminal=false
+Categories=Graphics;Utility;
+Keywords=wallpaper;background;gradient;theme;
+StartupWMClass=gradgen

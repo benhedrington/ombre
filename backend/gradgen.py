@@ -24,7 +24,7 @@ import argparse, colorsys, math, os, random, time
 import numpy as np
 from PIL import Image
 
-STYLES = ("linear", "glow", "aurora", "mesh", "any")
+STYLES = ("linear", "glow", "aurora", "mesh", "beam", "orb", "horizon", "split", "any")
 
 PRESETS = {
     # desktops / laptops
@@ -185,12 +185,13 @@ def warp_field(X, Y, rng, strength):
 def render(w, h, rng, style, palette=None, grain=0.025, warp=None, soft=False,
            interp="oklab", dim=False):
     if style == "any":
-        style = rng.choice(["linear", "glow", "aurora", "mesh"])
+        style = rng.choice(["linear", "glow", "aurora", "mesh", "beam", "orb", "horizon", "split"])
     cols = palette or make_palette(rng, rng.randint(3, 5), soft, dim)
     X, Y = grid(w, h)
 
     if warp is None:
-        warp = {"linear": 0.0, "glow": 0.0, "aurora": 0.12, "mesh": 0.15}[style]
+        warp = {"linear": 0.0, "glow": 0.0, "aurora": 0.12, "mesh": 0.15,
+                "beam": 0.02, "orb": 0.0, "horizon": 0.0, "split": 0.0}[style]
     if warp:
         X, Y = warp_field(X, Y, rng, warp)
 
@@ -198,8 +199,12 @@ def render(w, h, rng, style, palette=None, grain=0.025, warp=None, soft=False,
     ang = rng.uniform(0, math.tau)
     d = X * math.cos(ang) + Y * math.sin(ang)
     d = (d - d.min()) / (d.max() - d.min() + 1e-9)
-    base_cols = cols if style != "mesh" else [cols[0], cols[1]]
-    img = ramp(d, base_cols, interp)
+    if style == "horizon":
+        # A vertical ramp reads as a sky; the band added below is the horizon.
+        img = ramp((Y + 1) / 2, cols, interp)
+    else:
+        base_cols = cols if style != "mesh" else [cols[0], cols[1]]
+        img = ramp(d, base_cols, interp)
     a = w / h
 
     def glow(cx, cy, rx, ry, col, power, strength):
@@ -229,6 +234,48 @@ def render(w, h, rng, style, palette=None, grain=0.025, warp=None, soft=False,
             dist = -X * math.sin(ang2) + Y * math.cos(ang2) - off
             band = np.exp(-(dist / width) ** 2)
             img = img + band[..., None] * rng.choice(cols) * rng.uniform(0.5, 0.9)
+        img = np.clip(img, 0, 1)
+    elif style == "beam":
+        # Narrow shafts at one angle: stage light rather than aurora's ribbons.
+        img = img * rng.uniform(0.18, 0.35)
+        ang2 = rng.uniform(-0.7, 0.7)
+        for _ in range(rng.randint(3, 5)):
+            off = rng.uniform(-1.0, 1.0)
+            width = rng.uniform(0.05, 0.16)
+            dist = -X * math.sin(ang2) + Y * math.cos(ang2) - off
+            band = np.exp(-(dist / width) ** 2)
+            img = img + band[..., None] * rng.choice(cols) * rng.uniform(0.35, 0.7)
+        img = np.clip(img, 0, 1)
+    elif style == "orb":
+        # One off-centre light source with a wide halo, like a dim sun.
+        img = img * rng.uniform(0.10, 0.25)
+        cx, cy = rng.uniform(-0.45, 0.45) * a, rng.uniform(-0.45, 0.45)
+        radius = np.sqrt((X - cx) ** 2 + (Y - cy) ** 2)
+        core = np.exp(-(radius / rng.uniform(0.25, 0.5)) ** 2)
+        halo = np.exp(-(radius / rng.uniform(0.8, 1.5)) ** 2)
+        img = img + core[..., None] * cols[-1] * 1.0
+        img = img + halo[..., None] * cols[-1] * 0.35
+        img = np.clip(img, 0, 1)
+    elif style == "horizon":
+        # A bright band across a vertical sky gradient, plus a faint
+        # reflection below it. No warp: the horizon has to stay level.
+        yline = rng.uniform(-0.35, 0.25)
+        band = np.exp(-((Y - yline) / rng.uniform(0.05, 0.12)) ** 2)
+        reflect = np.exp(-((Y - (yline + 0.55)) / rng.uniform(0.18, 0.3)) ** 2)
+        img = (img * 0.5 + band[..., None] * cols[-1] * 0.75
+               + reflect[..., None] * cols[-1] * 0.22)
+        img = np.clip(img, 0, 1)
+    elif style == "split":
+        # The dark end and the accent end meeting at a soft diagonal seam, with
+        # a thin glow along the seam so it reads as light, not a fold.
+        ang2 = rng.uniform(0, math.tau)
+        off = rng.uniform(-0.4, 0.4)
+        width = rng.uniform(0.08, 0.3)
+        t = (X * math.cos(ang2) + Y * math.sin(ang2) - off) / width
+        seam = 1 / (1 + np.exp(-t))
+        img = (cols[0][None, None, :] * seam[..., None]
+               + cols[-1][None, None, :] * (1 - seam[..., None]))
+        img = img + np.exp(-t ** 2)[..., None] * cols[-1] * 0.12
         img = np.clip(img, 0, 1)
 
     # soft vignette

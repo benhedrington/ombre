@@ -54,7 +54,7 @@ Backend::~Backend() {
 }
 
 QStringList Backend::styles() const {
-    return {"any", "linear", "glow", "aurora", "mesh"};
+    return {"any", "linear", "glow", "aurora", "mesh", "beam", "orb", "horizon", "split"};
 }
 
 QStringList Backend::paletteModes() const {

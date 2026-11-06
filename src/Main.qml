@@ -121,7 +121,7 @@ ApplicationWindow {
                             focusPolicy: Qt.NoFocus
                             font.pixelSize: 12
                             Layout.preferredWidth: 105
-                            model: [qsTr("Any"), qsTr("Linear"), qsTr("Glow"), qsTr("Aurora"), qsTr("Mesh")]
+                            model: [qsTr("Any"), qsTr("Linear"), qsTr("Glow"), qsTr("Aurora"), qsTr("Mesh"), qsTr("Beam"), qsTr("Orb"), qsTr("Horizon"), qsTr("Split")]
                             currentIndex: backend.styles.indexOf(backend.style)
                             onActivated: backend.style = backend.styles[index]
                         }

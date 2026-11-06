@@ -45,7 +45,9 @@ the four colours the next set will use.
 - Accents are pulled toward the theme's lighter background on purpose. A
   wallpaper sits behind everything; full-strength accents glare and fight the
   bar. There is no soft toggle to get wrong.
-- **Style** — `Any`, `Linear`, `Glow`, `Aurora`, or `Mesh`.
+- **Style** — `Any`, `Linear`, `Glow`, `Aurora`, `Mesh`, `Beam`, `Orb`, `Horizon`, or `Split`.
+  Beam is shafts of light, Orb a single glow, Horizon a band on a vertical sky,
+  Split a soft diagonal seam.
 - **Size** — 1920×1200 (this panel), 1920×1080, 3840×2400, 3840×2160.
 - **Count** — 3 to 12 candidates per set.
 - **Grain** — film grain (0 to 0.06, default 0.025) that doubles as dither, so

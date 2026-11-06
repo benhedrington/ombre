@@ -10,6 +10,18 @@ match the theme you are running instead of a fixed palette. The heavy lifting
 is the same Python renderer as `gradgen.py`: a base ramp, soft glows, optional
 flow warp, vignette, and grain to stop banding.
 
+## Install
+
+The v0.1.0 release carries an x86_64 package for manual install:
+
+```sh
+gh release download v0.1.0 -R benhedrington/ombre -p '*x86_64.pkg.tar.zst'
+sudo pacman -U ombre-0.1.0-1-x86_64.pkg.tar.zst
+```
+
+On aarch64, or to build from a checkout, `bin/install` builds and installs the
+local package.
+
 ## Build and run
 
 ```sh
